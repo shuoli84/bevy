@@ -687,6 +687,10 @@ pub struct Bundles {
 }
 
 impl Bundles {
+    pub fn len(&self) -> usize {
+        self.bundle_infos.len()
+    }
+
     #[inline]
     pub fn get(&self, bundle_id: BundleId) -> Option<&BundleInfo> {
         self.bundle_infos.get(bundle_id.index())

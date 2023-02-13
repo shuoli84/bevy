@@ -42,3 +42,7 @@ path = "examples/resources.rs"
 [[example]]
 name = "change_detection"
 path = "examples/change_detection.rs"
+
+[[example]]
+name = "large_number_of_components"
+path = "examples/large_number_of_components.rs"

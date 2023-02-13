@@ -52,6 +52,16 @@ macro_rules! impl_sparse_array {
                 let index = index.sparse_set_index();
                 self.values.get(index).map(|v| v.as_ref()).unwrap_or(None)
             }
+
+            #[inline]
+            pub fn len(&self) -> usize {
+                self.values.len()
+            }
+
+            #[inline]
+            pub fn mem_size(&self) -> usize {
+                self.values.len() * std::mem::size_of::<V>()
+            }
         }
     };
 }
@@ -323,6 +333,16 @@ macro_rules! impl_sparse_set {
             #[inline]
             pub fn len(&self) -> usize {
                 self.dense.len()
+            }
+
+            #[inline]
+            pub fn sparse_len(&self) -> usize {
+                self.sparse.len()
+            }
+
+            #[inline]
+            pub fn sparse_mem_size(&self) -> usize {
+                self.sparse.mem_size()
             }
 
             #[inline]

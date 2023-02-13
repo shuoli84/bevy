@@ -392,6 +392,14 @@ impl Archetype {
         self.components.indices()
     }
 
+    pub fn components_sparse_len(&self) -> usize {
+        self.components.sparse_len()
+    }
+
+    pub fn components_sparse_mem_size(&self) -> usize {
+        self.components.sparse_mem_size()
+    }
+
     /// Fetches a immutable reference to the archetype's [`Edges`], a cache of
     /// archetypal relationships.
     #[inline]
