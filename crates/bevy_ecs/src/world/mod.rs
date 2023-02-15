@@ -838,7 +838,7 @@ impl World {
     ///
     /// The value given by the [`FromWorld::from_world`] method will be used.
     /// Note that any resource with the `Default` trait automatically implements `FromWorld`,
-    /// and those default values will be here instead.
+    /// and those default values will be used instead.
     ///
     /// # Panics
     ///
@@ -935,6 +935,7 @@ impl World {
             .unwrap_or(false)
     }
 
+    /// Returns `true` if resource of type `R` is newly added since last change tick
     pub fn is_resource_added<R: Resource>(&self) -> bool {
         self.components
             .get_resource_id(TypeId::of::<R>())
@@ -943,6 +944,7 @@ impl World {
             .unwrap_or(false)
     }
 
+    /// Returns `true` if resource of type `R` is changed since last change tick
     pub fn is_resource_changed<R: Resource>(&self) -> bool {
         self.components
             .get_resource_id(TypeId::of::<R>())
@@ -1450,7 +1452,9 @@ impl World {
         component_id
     }
 
-    /// Empties queued entities and adds them to the empty [Archetype](crate::archetype::Archetype).
+    /// Empties queued entities, because there is no component attached yet,
+    /// so adds them to the EMPTY [Archetype](crate::archetype::Archetype).
+    ///
     /// This should be called before doing operations that might operate on queued entities,
     /// such as inserting a [Component].
     pub(crate) fn flush(&mut self) {
