@@ -14,7 +14,7 @@ use std::{any::TypeId, borrow::Cow, marker::PhantomData};
 
 /// A function system that runs with exclusive [`World`] access.
 ///
-/// You get this by calling [`IntoSystem::into_system`]  on a function that only accepts
+/// You get this by calling [`IntoSystem::into_system`] on a function that only accepts
 /// [`ExclusiveSystemParam`]s.
 ///
 /// [`ExclusiveFunctionSystem`] must be `.initialized` before they can be run.

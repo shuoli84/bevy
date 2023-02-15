@@ -17,6 +17,9 @@ use std::borrow::Cow;
 /// Systems are added to an application using `App::add_system(my_system)`
 /// or similar methods, and will generally run once per pass of the main loop.
 ///
+/// Though systems can have any kind of output, only systems outputs `()` can be added to scheduler.
+/// In this case, you can pipe it with [`ignore`](`crate::system::adapter::ignore`).
+///
 /// Systems are executed in parallel, in opportunistic order; data access is managed automatically.
 /// It's possible to specify explicit execution order between specific systems,
 /// see [`IntoSystemConfig`](crate::schedule::IntoSystemConfig).
