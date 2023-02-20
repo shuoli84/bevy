@@ -9,6 +9,7 @@ use bevy::prelude::*;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .add_plugin(diagnostic::FrameTimePlugin::default())
         .insert_resource(AmbientLight {
             color: Color::WHITE,
             brightness: 1.0,
@@ -135,6 +136,77 @@ fn keyboard_animation_control(
                     Duration::from_millis(250),
                 )
                 .repeat();
+        }
+    }
+}
+
+mod diagnostic {
+    use bevy::prelude::*;
+    use std::time::{Duration, Instant};
+
+    #[derive(Default)]
+    pub struct FrameTimePlugin {}
+
+    impl Plugin for FrameTimePlugin {
+        fn build(&self, app: &mut App) {
+            app.insert_resource(FrameTimeState::default())
+                .add_system(frame_start.in_base_set(CoreSet::First))
+                .add_system(frame_end.in_base_set(CoreSet::LastFlush));
+        }
+    }
+
+    #[derive(Default, Resource)]
+    pub struct FrameTimeState {
+        frame_start: Option<Instant>,
+        last_logged_time: Option<Instant>,
+        history: Vec<Duration>,
+    }
+
+    /// record current system time for frame start
+    fn frame_start(mut state: ResMut<FrameTimeState>) {
+        let now = std::time::Instant::now();
+        state.frame_start = Some(now);
+        // set default value for 1st frame
+        if state.last_logged_time.is_none() {
+            state.last_logged_time = Some(now);
+        }
+    }
+
+    /// record frame's end time
+    fn frame_end(mut state: ResMut<FrameTimeState>) {
+        let now = Instant::now();
+
+        if let Some(frame_start) = state.frame_start.take() {
+            state
+                .history
+                .push((std::time::Instant::now().duration_since(frame_start)).into());
+        }
+
+        if let Some(last_time) = state.last_logged_time {
+            if now.duration_since(last_time) > Duration::from_secs(5) {
+                // do print logic
+                state.history.sort_unstable();
+
+                let len = state.history.len();
+                if len > 0 {
+                    let max = state.history[len - 1];
+                    let min = state.history[0];
+                    let pct50 = state.history[len / 2];
+                    let pct90 = state.history[len * 9 / 10];
+
+                    info!(
+                        "min:{min}us p50:{pct50}us p90:{pct90}us max:{max}us",
+                        min = min.as_nanos() / 1000,
+                        pct50 = pct50.as_nanos() / 1000,
+                        pct90 = pct90.as_nanos() / 1000,
+                        max = max.as_nanos() / 1000,
+                    );
+                }
+
+                state.history.clear();
+                state.frame_start = None;
+                state.last_logged_time = Some(now);
+            }
         }
     }
 }
